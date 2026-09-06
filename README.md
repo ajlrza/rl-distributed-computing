@@ -11,9 +11,9 @@ graph TD
     end
     A[CLI] --> A1
     subgraph Remote Cluster
-          A1 --> B
+          CONTROL --> B
       end
-    B -- Yes --> C[Great!]
+    B -- Yes --> A2
     B -- No --> D[Debug Code]
     D --> B
 ```
