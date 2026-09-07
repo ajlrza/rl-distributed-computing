@@ -6,14 +6,23 @@ Distrbuted computing system for [Imitation Learning](https://github.com/LeeMarsh
 
 ```mermaid
 graph TD
-    subgraph Experiment Cluster
-        A1 --> A2
+    subgraph Z[Experiment Cluster]
+        PyTorch --> Code
     end
-    A[CLI] --> A1
-    subgraph Remote Cluster
-          CONTROL --> B
+    subgraph K[Remote Resources]
+        RESOURCES --> GPU
+    end
+    subgraph X[Remote Connection]
+          CONTROL
+    end
+    subgraph Y[Security Layer]
+          subgraph J[End User]
+                SSH --> CONTROL
+            end
       end
-    B -- Yes --> A2
-    B -- No --> D[Debug Code]
-    D --> B
+    RESOURCES --> CONTROL
+    CONTROL --> Y[Security Layer]
+    J[End User] --> Z[Experiment Cluster]
+    X[Remote Connection] --> A[REMOTE COMPUTER CLI]
+    A[REMOTE COMPUTER CLI] --> K[Remote Resources]
 ```
