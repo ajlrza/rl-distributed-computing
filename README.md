@@ -4,6 +4,8 @@ Distributed computing system for [Imitation Learning](https://github.com/LeeMars
 
 # Diagram Draft
 
+NOTE: For simplicity and diagram purposes, only 3 GPU resources were demonstrated in the diagram
+
 ```mermaid
 graph TD
 
@@ -11,13 +13,11 @@ graph TD
         style Y fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
         subgraph J[End User]
             style J fill:#ce93d8,stroke:#4a148c,stroke-width:2px,color:#000
-            SSH[SSH]
         end
     end
 
-    subgraph X[Remote Connection]
-        style X fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
-        TRANSPORT[Transport]
+    subgraph TRANSPORT[Transport]
+        style TRANSPORT fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
     end
 
     subgraph Z[Experiment Cluster]
@@ -41,36 +41,53 @@ graph TD
     end
 
     CONTROL[CONTROL]
-    A[Remote Computer CLI]
+    A[REMOTE SERVER]
 
-    SSH --> CONTROL
-    CONTROL --> TRANSPORT
+    J[End User] --- Z[Experiment Cluster]
+
+    Code --> PyTorch
+    Code --> Encrypted_Data
+    Encrypted_Data --> CONTROL
+    CONTROL --> |Encrypted Data| RESTFUL_REQUEST
+    RESTFUL_REQUEST -.-> |Encrypted Data| TRANSPORT
     TRANSPORT --> A
-    A -.->|status| TRANSPORT
-    TRANSPORT -.->|status| CONTROL
 
-    CONTROL --> PyTorch
-    Code -.->|results| CONTROL
+    A -.-> |Encrypted Resnpose| TRANSPORT
+    TRANSPORT --> |Encrypted Resnpose| RESTFUL_REQUEST
+    RESTFUL_REQUEST -.-> |Encrypted Response| CONTROL
+    CONTROL --> Encrypted_Response
+    Encrypted_Response --> |Encrypted Response| Z[Experiment Cluster]
 
-    A --> KNOCK_MECHANISM_1[Knock Mechanism 1]
-    KNOCK_MECHANISM_1 --> System_Call_1[System Call 1]
-    System_Call_1 --> Resources_Check_1{Resources Check 1}
+    Code -.->|results| GITHUB
+
+    A --> RESTFUL_API_CALL_1[RESTFUL API CALL 1]
+    RESTFUL_API_CALL_1 --> Nginx_Server_1[Nginx Server 1]
+    Nginx_Server_1 --> GoLang_Service_1[GoLang Service 1]
+    GoLang_Service_1 --> DOCKER_API_CALL_1[Docker API Call 1]
+    DOCKER_API_CALL_1 --> System_Info_1[System Info 1]
+    System_Info_1 --> Resources_Check_1{Resources Check 1}
     Resources_Check_1 -->|UP| CONTINUE_THE_1[Continue 1]
     Resources_Check_1 -->|DOWN| SKIP_THE_1[Skip 1]
     CONTINUE_THE_1 --> RESOURCES_ONE
     GPU_ONE -.->|result| A
 
-    A --> KNOCK_MECHANISM_2[Knock Mechanism 2]
-    KNOCK_MECHANISM_2 --> System_Call_2[System Call 2]
-    System_Call_2 --> Resources_Check_2{Resources Check 2}
+    A --> RESTFUL_API_CALL_2[RESTFUL API CALL 2]
+    RESTFUL_API_CALL_2 --> Nginx_Server_2[Nginx Server 2]
+    Nginx_Server_2 --> GoLang_Service_2[GoLang Service 2]
+    GoLang_Service_2 --> DOCKER_API_CALL_2[Docker API Call 2]
+    DOCKER_API_CALL_2 --> System_Info_2[System Info 2]
+    System_Info_2 --> Resources_Check_2{Resources Check 2}
     Resources_Check_2 -->|UP| CONTINUE_THE_2[Continue 2]
     Resources_Check_2 -->|DOWN| SKIP_THE_2[Skip 2]
     CONTINUE_THE_2 --> RESOURCES_TWO
     GPU_TWO -.->|result| A
 
-    A --> KNOCK_MECHANISM_3[Knock Mechanism 3]
-    KNOCK_MECHANISM_3 --> System_Call_3[System Call 3]
-    System_Call_3 --> Resources_Check_3{Resources Check 3}
+    A --> RESTFUL_API_CALL_3[RESTFUL API CALL 3]
+    RESTFUL_API_CALL_3 --> Nginx_Server_3[Nginx Server 3]
+    Nginx_Server_3 --> GoLang_Service_3[GoLang Service 3]
+    GoLang_Service_3 --> DOCKER_API_CALL_3[Docker API Call 3]
+    DOCKER_API_CALL_3 --> System_Info_3[System Info 3]
+    System_Info_3 --> Resources_Check_3{Resources Check 3}
     Resources_Check_3 -->|UP| CONTINUE_THE_3[Continue 3]
     Resources_Check_3 -->|DOWN| SKIP_THE_3[Skip 3]
     CONTINUE_THE_3 --> RESOURCES_THREE
@@ -78,16 +95,31 @@ graph TD
 
     classDef controlNodes fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000;
     classDef sysCalls fill:#e0f7fa,stroke:#00838f,stroke-width:2px,color:#000;
+    classDef sysInfos fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:#000;
     classDef resources fill:#c8e6c9,stroke:#2e7d32,stroke-width:1px,color:#000;
     classDef actions fill:#fff3e0,stroke:#ef6c00,stroke-width:1px,color:#000;
     classDef clusterNodes fill:#cfd8dc,stroke:#455a64,stroke-width:1px,color:#000;
+    
+    classDef secureData fill:#e1bee7,stroke:#8e24aa,stroke-width:2px,color:#000;
+    classDef networkReq fill:#bbdefb,stroke:#1976d2,stroke-width:2px,color:#000;
+    classDef external fill:#f5f5f5,stroke:#424242,stroke-width:2px,color:#000;
+    classDef webServers fill:#b2dfdb,stroke:#00796b,stroke-width:2px,color:#000;
+    classDef backend fill:#b3e5fc,stroke:#0288d1,stroke-width:2px,color:#000;
+    classDef docker fill:#81d4fa,stroke:#0277bd,stroke-width:2px,color:#000;
 
     class CONTROL,A controlNodes;
-    class KNOCK_MECHANISM_1,KNOCK_MECHANISM_2,KNOCK_MECHANISM_3 sysCalls;
-    class System_Call_1,System_Call_2,System_Call_3 sysCalls;
+    class RESTFUL_API_CALL_1,RESTFUL_API_CALL_2,RESTFUL_API_CALL_3 sysCalls;
+    class System_Info_1,System_Info_2,System_Info_3 sysInfos;
     class Resources_Check_1,Resources_Check_2,Resources_Check_3 sysCalls;
     class RESOURCES_ONE,GPU_ONE,RESOURCES_TWO,GPU_TWO,RESOURCES_THREE,GPU_THREE resources;
     class CONTINUE_THE_1,SKIP_THE_1,CONTINUE_THE_2,SKIP_THE_2,CONTINUE_THE_3,SKIP_THE_3 actions;
     class SSH,TRANSPORT actions;
     class PyTorch,Code clusterNodes;
+
+    class Encrypted_Data,Encrypted_Response secureData;
+    class RESTFUL_REQUEST networkReq;
+    class GITHUB external;
+    class Nginx_Server_1,Nginx_Server_2,Nginx_Server_3 webServers;
+    class GoLang_Service_1,GoLang_Service_2,GoLang_Service_3 backend;
+    class DOCKER_API_CALL_1,DOCKER_API_CALL_2,DOCKER_API_CALL_3 docker;
 ```
